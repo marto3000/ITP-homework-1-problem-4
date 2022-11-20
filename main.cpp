@@ -30,58 +30,60 @@ bool repeatNumbers(int testNum)
 	return false;
 }
 
-//int removeLeftNum(int num)
-//{
-//	int currentPos = 1;
-//	for (int i = num; i >= 10; i /= 10)
-//	{
-//		currentPos *= 10;
-//	}
-//	num = num % currentPos;
-//	return num;
-//}
-
-//int power(int var, int powerVar)
-//{
-//	int result = var;
-//	if (powerVar == 0)
-//	{
-//		result = 1;
-//	}
-//	else
-//	{
-//		while (powerVar > 1)
-//		{
-//			result *= var;
-//			powerVar--;
-//		}
-//	}
-//	return result;
-//}
-
-int numberWithLengthX(int x, int originalX, int num, int finallSum)
+int power(int var, int powerVar)
 {
-	int buildNum;
-	for (int i = num; i > 0 && numLength(i) >= x; i /= 10)
+	int result = var;
+	if (powerVar == 0)
 	{
-		buildNum = i % 10;
-		if (numLength(buildNum) < x)
+		result = 1;
+	}
+	else
+	{
+		while (powerVar > 1)
 		{
-			buildNum += numberWithLengthX(x - 1, x, i / 10, 0) * 10;
-		}
-		if (numLength(buildNum) < originalX)
-		{
-			return buildNum;
-		}
-		else
-		{
-			if (repeatNumbers(buildNum) == false)
-			{
-				finallSum += buildNum;
-			}
+			result *= var;
+			powerVar--;
 		}
 	}
-	return finallSum;
+	return result;
+}
+
+int createNum(int num, int code)
+{
+	int finalNum = 0;
+	if (code == 0)
+	{
+		return 0;
+	}
+	bool last = false;
+	if (code < 0)
+	{
+		code *= -1;
+		last = true;
+	}
+	for (int i = code; i >= 10; i /= 10)
+	{
+		if (i % 10 <= (i / 10) % 10)
+		{
+			return 0;
+		}
+	}
+	for (int i = code; i > 0; i /= 10)
+	{
+		if (i % 10 > numLength(num))
+		{
+			return 0;
+		}
+	}
+	for (int i = code; i > 0; i /= 10)
+	{
+		finalNum += ((num / power(10, numLength(num) - (i % 10))) % 10) * power(10, numLength(code) - numLength(i));
+	}
+	if (last == true)
+	{
+		finalNum += (num / (power(10, 9)) * power(10, 9));
+	}
+	return finalNum;
 }
 
 int main()
@@ -91,19 +93,24 @@ int main()
 	{
 		cin >> num;
 	} while (num < 1);
-	int lengthRestriction;
-	if (numLength(num) > 10)
+	int minCode = 1;
+	int maxCode = 123456789;
+	if (numLength(num) > 9)
 	{
-		lengthRestriction = 10;
+		minCode = -maxCode;
 	}
-	else
+	while (numLength(maxCode) > numLength(num))
 	{
-		lengthRestriction = numLength(num);
+		maxCode /= 10;
 	}
 	int sum = 0;
-	for (int i = 1; i <= lengthRestriction; i++)
+	for (int code = minCode; code <= maxCode; code++)
 	{
-		sum += numberWithLengthX(i, i, num, 0);
+		int buildNum = createNum(num, code);
+		if (buildNum != 0 && repeatNumbers(buildNum) == false)
+		{
+			sum += buildNum;
+		}
 	}
 	cout << sum;
 
