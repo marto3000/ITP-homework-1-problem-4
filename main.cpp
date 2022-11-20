@@ -1,17 +1,22 @@
 #include <iostream>
 using namespace std;
 
-bool repeatNumbers(int testNum)
+int numLength(int num)
 {
 	int length = 0;
-	for (int i = testNum; i > 0; i /= 10)
+	while (num > 0)
 	{
+		num /= 10;
 		length++;
 	}
-	bool check = true;
+	return length;
+}
+
+bool repeatNumbers(int testNum)
+{
 	while (testNum >= 10)
 	{
-		int tempTest = testNum;
+		int tempTest = testNum / 10;
 		while (tempTest > 0)
 		{
 			if (testNum % 10 == tempTest % 10)
@@ -25,26 +30,58 @@ bool repeatNumbers(int testNum)
 	return false;
 }
 
-int removeLeftNum(int num)
-{
-	int currentPos = 1;
-	for (int i = num; i >= 10; i /= 10)
-	{
-		currentPos *= 10;
-	}
-	num = num % currentPos;
-	return num;
-}
+//int removeLeftNum(int num)
+//{
+//	int currentPos = 1;
+//	for (int i = num; i >= 10; i /= 10)
+//	{
+//		currentPos *= 10;
+//	}
+//	num = num % currentPos;
+//	return num;
+//}
 
-int power(int var, int powerVar)
+//int power(int var, int powerVar)
+//{
+//	int result = var;
+//	if (powerVar == 0)
+//	{
+//		result = 1;
+//	}
+//	else
+//	{
+//		while (powerVar > 1)
+//		{
+//			result *= var;
+//			powerVar--;
+//		}
+//	}
+//	return result;
+//}
+
+int numberWithLengthX(int x, int originalX, int num, int finallSum)
 {
-	int result = var;
-	while (powerVar > 1)
+	int buildNum;
+	for (int i = num; i > 0 && numLength(i) >= x; i /= 10)
 	{
-		result *= var;
-		powerVar--;
+		buildNum = i % 10;
+		if (numLength(buildNum) < x)
+		{
+			buildNum += numberWithLengthX(x - 1, x, i / 10, 0) * 10;
+		}
+		if (numLength(buildNum) < originalX)
+		{
+			return buildNum;
+		}
+		else
+		{
+			if (repeatNumbers(buildNum) == false)
+			{
+				finallSum += buildNum;
+			}
+		}
 	}
-	return result;
+	return finallSum;
 }
 
 int main()
@@ -54,45 +91,20 @@ int main()
 	{
 		cin >> num;
 	} while (num < 1);
-	int numLengthRestriction = 0;
-	for (int i = num; i > 0; i /= 10)
+	int lengthRestriction;
+	if (numLength(num) > 10)
 	{
-		numLengthRestriction++;
+		lengthRestriction = 10;
 	}
-	if (numLengthRestriction > 10)
+	else
 	{
-		numLengthRestriction = 10;
+		lengthRestriction = numLength(num);
 	}
-
 	int sum = 0;
-	int buildNum;
-	for (int i = 1; i <= numLengthRestriction; i++)//using all possible lengths
+	for (int i = 1; i <= lengthRestriction; i++)
 	{
-		for (int j = num; j > 0; j /= 10)//going through all starting possitions from "num"
-		{
-			buildNum = j % 10;
-			if (i == 1)
-			{
-				sum += buildNum;
-			}
-			for (int k = 1; j / power(10, k) > 0 && k < i; k++)//building a number by going through all possitions of "j" (k = 1 starts from position 2 (10) )
-			{
-				buildNum += ((j / power(10, k)) % 10) * power(10, k);
-				if (repeatNumbers(buildNum))
-				{
-					buildNum = removeLeftNum(buildNum);
-				}
-				else
-				{
-					if (buildNum < power(10, i) && buildNum >= power(10, i - 1))
-					{
-						sum += buildNum;
-						buildNum = removeLeftNum(buildNum);
-					}
-				}
-			}
-		}
-	}//12234
+		sum += numberWithLengthX(i, i, num, 0);
+	}
 	cout << sum;
 
 	return 0;
