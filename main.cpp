@@ -50,7 +50,6 @@ int power(int var, int powerVar)
 
 int createNum(int num, int code)
 {
-	int finalNum = 0;
 	if (code == 0)
 	{
 		return 0;
@@ -75,6 +74,7 @@ int createNum(int num, int code)
 			return 0;
 		}
 	}
+	int finalNum = 0;
 	for (int i = code; i > 0; i /= 10)
 	{
 		finalNum += ((num / power(10, numLength(num) - (i % 10))) % 10) * power(10, numLength(code) - numLength(i));
